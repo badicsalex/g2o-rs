@@ -1,0 +1,13 @@
+[package]
+name = "g2o-sys"
+description = "FFI bindings for G2O"
+version = "0.1.0"
+edition = "2021"
+authors = ["Alex Badics <admin@stickman.hu>"]
+categories = ["external-ffi-bindings", "mathematics"]
+license = "BSD-2-Clause"
+
+[dependencies]
+
+[build-dependencies]
+cmake = "0.1"
