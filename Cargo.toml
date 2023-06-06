@@ -8,6 +8,9 @@ categories = ["external-ffi-bindings", "mathematics"]
 license = "BSD-2-Clause"
 
 [dependencies]
+autocxx = "0.25.0"
+cxx = "1.0"
 
 [build-dependencies]
 cmake = "0.1"
+autocxx-build = "0.25.0"
