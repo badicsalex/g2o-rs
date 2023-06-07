@@ -1,16 +1,15 @@
 [package]
-name = "g2o-sys"
-description = "FFI bindings for G2O"
+name = "g2o"
+description = "Safe bindings for G2O"
 version = "0.1.0"
 edition = "2021"
 authors = ["Alex Badics <admin@stickman.hu>"]
-categories = ["external-ffi-bindings", "mathematics"]
+categories = ["api-bindings", "mathematics"]
 license = "BSD-2-Clause"
 
 [dependencies]
-autocxx = "0.25.0"
-cxx = "1.0"
+cpp = "0.5.8"
 
 [build-dependencies]
 cmake = "0.1"
-autocxx-build = "0.25.0"
+cpp_build = "0.5.8"

@@ -1,4 +1,8 @@
-use std::path::{Path, PathBuf};
+// Copyright (C) 2023, Alex Badics
+// This file is part of g2o-rs
+// Licensed under the BSD 2 Clause license. See LICENSE file in the project root for details.
+
+use std::path::PathBuf;
 
 fn build_g2o() -> PathBuf {
     let dst = cmake::Config::new("g2o")
@@ -13,21 +17,25 @@ fn build_g2o() -> PathBuf {
     println!("cargo:rustc-link-search=native={}", lib_path.display());
     println!("cargo:rustc-link-lib=fmt");
     println!("cargo:rustc-link-lib=cholmod");
+    for lib in lib_path.read_dir().unwrap() {
+        let libname = lib.unwrap().file_name().to_str().unwrap().to_owned();
+        if libname.starts_with("lib") && libname.ends_with(".a") {
+            println!(
+                "cargo:rustc-link-lib=static={}",
+                &libname[3..libname.len() - 2]
+            );
+        }
+    }
     dst
-}
-
-fn run_autocxx(g2o_include_path: &Path) {
-    let eigen_path = std::path::PathBuf::from("/usr/include/eigen3");
-    autocxx_build::Builder::new("src/lib.rs", [&eigen_path, g2o_include_path])
-        .extra_clang_args(&["-std=c++17"])
-        .build()
-        .unwrap()
-        .compile("g2o-bridge");
-    println!("cargo:rerun-if-changed=src/lib.rs");
 }
 
 fn main() {
     let g2o_build_path = build_g2o();
     let g2o_include_path = g2o_build_path.join("include");
-    run_autocxx(&g2o_include_path);
+    println!("cargo:rerun-if-changed=src/lib.rs");
+    cpp_build::Config::new()
+        .include(g2o_include_path)
+        .include("/usr/include/eigen3/")
+        .flag("-std=c++17")
+        .build("src/lib.rs");
 }

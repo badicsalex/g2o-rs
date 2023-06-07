@@ -1,6 +1,6 @@
-## g2o-sys
+## g2o bindings for Rust
 
-Raw, `autocxx`-generated FFI bindings for `g2o`.
+Safe, rusty bindings for the [g2o library](https://github.com/RainerKuemmerle/g2o).
 
 Experimental, unpublished, unmoisturized, unhappy.
 
