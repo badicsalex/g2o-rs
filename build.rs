@@ -2,10 +2,11 @@
 // This file is part of g2o-rs
 // Licensed under the BSD 2 Clause license. See LICENSE file in the project root for details.
 
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
 
 fn build_g2o() -> PathBuf {
     let dst = cmake::Config::new("g2o")
+        .define("G2O_NO_IMPLICIT_OWNERSHIP_OF_OBJECTS", "ON")
         .define("BUILD_SHARED_LIBS", "OFF")
         .define("G2O_USE_LGPL_LIBS", "OFF")
         .define("G2O_BUILD_APPS", "OFF")
@@ -29,13 +30,22 @@ fn build_g2o() -> PathBuf {
     dst
 }
 
+fn build_cpp(g2o_include_path: &Path) {
+    for entry in glob::glob("src/**/*.rs").unwrap() {
+        let entry = entry.unwrap();
+        let file_name = entry.as_path();
+        // TODO: skip files that don't have a cpp! macro
+        println!("cargo:rerun-if-changed={}", file_name.display());
+        cpp_build::Config::new()
+            .include(g2o_include_path)
+            .include("/usr/include/eigen3/")
+            .flag("-std=c++17")
+            .build(file_name);
+    }
+}
+
 fn main() {
     let g2o_build_path = build_g2o();
     let g2o_include_path = g2o_build_path.join("include");
-    println!("cargo:rerun-if-changed=src/lib.rs");
-    cpp_build::Config::new()
-        .include(g2o_include_path)
-        .include("/usr/include/eigen3/")
-        .flag("-std=c++17")
-        .build("src/lib.rs");
+    build_cpp(&g2o_include_path);
 }

@@ -5,12 +5,13 @@
 use g2o::{OptimizationAlgorithmFactory, OptimizationAlgorithmProperty, SparseOptimizer};
 
 fn main() {
-    let mut optimizer = SparseOptimizer::new();
     let mut solver_property = OptimizationAlgorithmProperty::new();
-    optimizer.set_algorithm(OptimizationAlgorithmFactory::construct(
+    let algo = OptimizationAlgorithmFactory::construct(
         "lm_var",
         &mut solver_property,
-    ));
+    );
+    let mut optimizer = SparseOptimizer::new();
+    optimizer.set_algorithm(&algo);
     optimizer.load("in.g2o");
     optimizer.initialize_optimization(0);
     optimizer.optimize(10, false);
