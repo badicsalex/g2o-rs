@@ -9,11 +9,13 @@ use std::{
 
 use cpp::cpp;
 
-use crate::{macros::proxy_obj, OptimizableGraphVertex};
+use crate::{macros::proxy_obj, OptimizableGraphEdge, OptimizableGraphVertex};
 
 cpp! {{
     #include "g2o/types/slam3d/types_slam3d.h"
     using namespace g2o;
+
+    G2O_USE_TYPE_GROUP(slam3d);
 }}
 
 proxy_obj!(VertexSE3, OptimizableGraphVertex);
@@ -32,6 +34,26 @@ impl VertexPointXYZ {
     fn construct() -> *mut c_void {
         cpp!( unsafe [] -> *mut c_void as "VertexPointXYZ*" {
             return new VertexPointXYZ();
+        })
+    }
+}
+
+proxy_obj!(EdgeSE3PointXYZDisparity, OptimizableGraphEdge);
+
+impl EdgeSE3PointXYZDisparity {
+    fn construct() -> *mut c_void {
+        cpp!( unsafe [] -> *mut c_void as "EdgeSE3PointXYZDisparity*" {
+            return new EdgeSE3PointXYZDisparity();
+        })
+    }
+}
+
+proxy_obj!(EdgeSE3, OptimizableGraphEdge);
+
+impl EdgeSE3 {
+    fn construct() -> *mut c_void {
+        cpp!( unsafe [] -> *mut c_void as "EdgeSE3*" {
+            return new EdgeSE3();
         })
     }
 }

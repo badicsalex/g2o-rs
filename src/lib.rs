@@ -13,9 +13,6 @@ cpp! {{
     #include "g2o/core/optimization_algorithm_factory.h"
     using namespace g2o;
 
-    G2O_USE_TYPE_GROUP(slam2d);
-    G2O_USE_TYPE_GROUP(slam3d);
-    G2O_USE_OPTIMIZATION_LIBRARY(eigen);
 }}
 
 pub use crate::core::*;

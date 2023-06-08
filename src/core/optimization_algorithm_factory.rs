@@ -6,15 +6,23 @@ use std::ffi::{c_void, CString};
 
 use cpp::cpp;
 
-use crate::macros::proxy_obj;
+use crate::macros::{proxy_obj, proxy_obj_abstract};
 
 cpp! {{
+    #include "g2o/core/optimization_algorithm.h"
     #include "g2o/core/optimization_algorithm_factory.h"
     using namespace g2o;
+
+    G2O_USE_OPTIMIZATION_LIBRARY(eigen);
 }}
 
-pub struct OptimizationAlgorithm {
-    pub(crate) obj: *mut c_void,
+proxy_obj_abstract!(OptimizationAlgorithm);
+impl OptimizationAlgorithm {
+    fn destruct(obj: *mut c_void) {
+        cpp!( unsafe [obj as "OptimizationAlgorithm*"] {
+            delete obj;
+        })
+    }
 }
 
 proxy_obj!(OptimizationAlgorithmProperty);
@@ -46,6 +54,6 @@ impl OptimizationAlgorithmFactory {
         let obj = cpp!( unsafe [name as  "char*", solver_property as "OptimizationAlgorithmProperty*"] -> *mut c_void as "OptimizationAlgorithm*"{
             return OptimizationAlgorithmFactory::instance()->construct(name, *solver_property);
         });
-        OptimizationAlgorithm { obj }
+        OptimizationAlgorithm::new_from(obj)
     }
 }

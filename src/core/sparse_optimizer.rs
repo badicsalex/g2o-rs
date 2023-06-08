@@ -27,7 +27,7 @@ impl<'stored> SparseOptimizer<'stored> {
 
     pub fn set_algorithm(&mut self, algorithm: &'stored OptimizationAlgorithm) {
         let obj = self.obj();
-        let algorithm = algorithm.obj;
+        let algorithm = algorithm.obj();
         cpp!( unsafe [obj as "SparseOptimizer*", algorithm as "OptimizationAlgorithm*"] {
             obj->setAlgorithm(algorithm);
         })

@@ -9,7 +9,7 @@ use std::{
 
 use cpp::cpp;
 
-use crate::macros::proxy_obj_abstract;
+use crate::{macros::proxy_obj_abstract, RobustKernel};
 
 cpp! {{
     #include "g2o/core/optimizable_graph.h"
@@ -108,6 +108,46 @@ impl OptimizableGraphEdge {
     fn destruct(obj: *mut c_void) {
         cpp!( unsafe [obj as "OptimizableGraph::Edge*"] {
             delete obj;
+        })
+    }
+
+    pub fn dimension(&self) -> usize {
+        let obj = self.obj();
+        cpp!( unsafe [obj as "OptimizableGraph::Edge*"] -> i32 as "int" {
+            return obj->dimension();
+        }) as usize
+    }
+
+    pub fn chi2(&self) -> f64 {
+        let obj = self.obj();
+        cpp!( unsafe [obj as "OptimizableGraph::Edge*"] -> f64 as "double" {
+            return obj->chi2();
+        })
+    }
+
+    pub fn set_measurement_data(&mut self, measurement: &[f64]) -> bool {
+        assert!(measurement.len() >= self.dimension());
+        let obj = self.obj();
+        let measurement = measurement.as_ptr();
+        cpp!( unsafe [obj as "OptimizableGraph::Edge*", measurement as "double*"] -> bool as "bool" {
+            return obj->setMeasurementData(measurement);
+        })
+    }
+
+    pub fn get_measurement_data(&mut self, measurement: &mut [f64]) -> bool {
+        assert!(measurement.len() >= self.dimension());
+        let obj = self.obj();
+        let measurement = measurement.as_ptr();
+        cpp!( unsafe [obj as "OptimizableGraph::Edge*", measurement as "double*"] -> bool as "bool" {
+            return obj->getMeasurementData(measurement);
+        })
+    }
+
+    pub fn set_robust_kernel(&mut self, rk: &RobustKernel) {
+        let obj = self.obj();
+        let rk = rk.obj();
+        cpp!( unsafe [obj as "OptimizableGraph::Edge*", rk as "RobustKernel*"] {
+            obj->setRobustKernel(rk);
         })
     }
 }
