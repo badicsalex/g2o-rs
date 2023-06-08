@@ -3,6 +3,8 @@
 // Licensed under the BSD 2 Clause license. See LICENSE file in the project root for details.
 
 mod core;
+pub(crate) mod macros;
+mod types;
 
 use cpp::cpp;
 
@@ -17,3 +19,4 @@ cpp! {{
 }}
 
 pub use crate::core::*;
+pub use crate::types::*;
