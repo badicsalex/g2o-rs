@@ -2,7 +2,7 @@
 // This file is part of g2o-rs
 // Licensed under the BSD 2 Clause license. See LICENSE file in the project root for details.
 
-use std::path::{PathBuf, Path};
+use std::path::{Path, PathBuf};
 
 fn build_g2o() -> PathBuf {
     let dst = cmake::Config::new("g2o")

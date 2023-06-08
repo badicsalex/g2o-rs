@@ -20,6 +20,15 @@ pub struct OptimizableGraph<'stored> {
 }
 
 impl<'stored> OptimizableGraph<'stored> {
+    pub(crate) fn new_from_child(obj: *mut c_void) -> Self {
+        Self {
+            obj,
+            stored_stuff_tag: PhantomData,
+        }
+    }
+    pub(crate) fn obj(&mut self) -> *mut c_void {
+        self.obj
+    }
     pub fn load(&mut self, filename: &str) -> bool {
         let obj = self.obj;
         let filename = CString::new(filename).unwrap();
@@ -35,6 +44,14 @@ impl<'stored> OptimizableGraph<'stored> {
         let filename = filename.as_ptr();
         cpp!( unsafe [obj as "OptimizableGraph*", filename as "char*"] -> bool as "bool"{
             return obj->save(filename);
+        })
+    }
+}
+impl<'stored> Drop for OptimizableGraph<'stored> {
+    fn drop(&mut self) {
+        let obj = self.obj();
+        cpp!( unsafe [obj as "OptimizableGraph*"] {
+            delete obj;
         })
     }
 }

@@ -3,13 +3,13 @@
 // Licensed under the BSD 2 Clause license. See LICENSE file in the project root for details.
 
 use std::{
-    ffi::{c_void, CString},
-    marker::PhantomData,
+    ffi::c_void,
+    ops::{Deref, DerefMut},
 };
 
 use cpp::cpp;
 
-use crate::OptimizationAlgorithm;
+use crate::{OptimizableGraph, OptimizationAlgorithm};
 
 cpp! {{
     #include "g2o/core/sparse_optimizer.h"
@@ -17,8 +17,7 @@ cpp! {{
 }}
 
 pub struct SparseOptimizer<'stored> {
-    obj: *mut c_void,
-    stored_stuff_tag: PhantomData<&'stored ()>,
+    parent: OptimizableGraph<'stored>,
 }
 
 impl<'stored> SparseOptimizer<'stored> {
@@ -28,13 +27,19 @@ impl<'stored> SparseOptimizer<'stored> {
             return new SparseOptimizer();
         });
         Self {
-            obj,
-            stored_stuff_tag: PhantomData,
+            parent: OptimizableGraph::new_from_child(obj),
         }
     }
 
+    fn obj(&mut self) -> *mut c_void {
+        // NOTE: this is only correct because on C++ side this
+        //       class has only one parent. The correct thing to
+        //       do would be a dynamic_cast or similar.
+        self.parent.obj()
+    }
+
     pub fn set_algorithm(&mut self, algorithm: &'stored OptimizationAlgorithm) {
-        let obj = self.obj;
+        let obj = self.obj();
         let algorithm = algorithm.obj;
         cpp!( unsafe [obj as "SparseOptimizer*", algorithm as "OptimizationAlgorithm*"] {
             obj->setAlgorithm(algorithm);
@@ -42,47 +47,30 @@ impl<'stored> SparseOptimizer<'stored> {
     }
 
     pub fn initialize_optimization(&mut self, level: i32) -> bool {
-        let obj = self.obj;
+        let obj = self.obj();
         cpp!( unsafe [obj as "SparseOptimizer*", level as "int"] -> bool as "bool"{
             return obj->initializeOptimization(level);
         })
     }
 
     pub fn optimize(&mut self, iterations: i32, online: bool) -> i32 {
-        let obj = self.obj;
+        let obj = self.obj();
         cpp!( unsafe [obj as "SparseOptimizer*", iterations as "int", online as "bool"] -> i32 as "int"{
             return obj->optimize(iterations, online);
         })
     }
+}
 
-    // TODO: this is actually a method of the parent class, so we should
-    //       instead implement it as such, and also use Deref.
-    pub fn load(&mut self, filename: &str) -> bool {
-        let obj = self.obj;
-        let filename = CString::new(filename).unwrap();
-        let filename = filename.as_ptr();
-        cpp!( unsafe [obj as "SparseOptimizer*", filename as "char*"] -> bool as "bool"{
-            return obj->load(filename);
-        })
-    }
+impl<'stored> Deref for SparseOptimizer<'stored> {
+    type Target = OptimizableGraph<'stored>;
 
-    // TODO: this is actually a method of the parent class, so we should
-    //       instead implement it as such, and also use Deref.
-    pub fn save(&mut self, filename: &str) -> bool {
-        let obj = self.obj;
-        let filename = CString::new(filename).unwrap();
-        let filename = filename.as_ptr();
-        cpp!( unsafe [obj as "SparseOptimizer*", filename as "char*"] -> bool as "bool"{
-            return obj->save(filename);
-        })
+    fn deref(&self) -> &Self::Target {
+        &self.parent
     }
 }
 
-impl<'stored> Drop for SparseOptimizer<'stored> {
-    fn drop(&mut self) {
-        let obj = self.obj;
-        cpp!( unsafe [obj as "SparseOptimizer*"] {
-            delete obj;
-        })
+impl<'stored> DerefMut for SparseOptimizer<'stored> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.parent
     }
 }
