@@ -10,14 +10,6 @@ macro_rules! proxy_obj_no_constructor {
 
         impl $(<$nlt>)? $name $(<$nlt>)? {
             #[allow(dead_code)]
-            pub(crate) fn obj_mut(&mut self) -> *mut c_void {
-                // NOTE: this is only correct if this class has only one parent
-                //       on C++ side. The correct thing to do would be a
-                //       dynamic_cast or similar.
-                self.parent.obj_mut()
-            }
-
-            #[allow(dead_code)]
             pub(crate) fn obj(&self) -> *const c_void {
                 // NOTE: this is only correct if this class has only one parent
                 //       on C++ side. The correct thing to do would be a
@@ -47,11 +39,6 @@ macro_rules! proxy_obj_no_constructor {
         }
 
         impl $(<$nlt>)? $name $(<$nlt>)? {
-            #[allow(dead_code)]
-            pub(crate) fn obj_mut(&mut self) -> *mut c_void {
-                self._obj
-            }
-
             #[allow(dead_code)]
             pub(crate) fn obj(&self) -> *const c_void {
                 self._obj

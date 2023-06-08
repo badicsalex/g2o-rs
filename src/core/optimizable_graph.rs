@@ -78,7 +78,7 @@ impl OptimizableGraphVertex {
 
     pub fn set_estimate_data(&mut self, estimate: &[f64]) -> bool {
         assert!(estimate.len() >= self.estimate_dimension());
-        let obj = self.obj_mut();
+        let obj = self.obj();
         let estimate = estimate.as_ptr();
         cpp!( unsafe [obj as "OptimizableGraph::Vertex*", estimate as "double*"] -> bool as "bool" {
             return obj->setEstimateData(estimate);
@@ -87,7 +87,7 @@ impl OptimizableGraphVertex {
 
     pub fn get_estimate_data(&mut self, estimate: &mut [f64]) -> bool {
         assert!(estimate.len() >= self.estimate_dimension());
-        let obj = self.obj_mut();
+        let obj = self.obj();
         let estimate = estimate.as_ptr();
         cpp!( unsafe [obj as "OptimizableGraph::Vertex*", estimate as "double*"] -> bool as "bool" {
             return obj->getEstimateData(estimate);

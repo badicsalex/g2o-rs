@@ -42,7 +42,7 @@ impl OptimizationAlgorithmFactory {
     ) -> OptimizationAlgorithm {
         let name = CString::new(name).unwrap();
         let name = name.as_ptr();
-        let solver_property = solver_property.obj_mut();
+        let solver_property = solver_property.obj();
         let obj = cpp!( unsafe [name as  "char*", solver_property as "OptimizationAlgorithmProperty*"] -> *mut c_void as "OptimizationAlgorithm*"{
             return OptimizationAlgorithmFactory::instance()->construct(name, *solver_property);
         });
