@@ -36,12 +36,12 @@ fn build_cpp(g2o_include_path: &Path) {
         let file_name = entry.as_path();
         // TODO: skip files that don't have a cpp! macro
         println!("cargo:rerun-if-changed={}", file_name.display());
-        cpp_build::Config::new()
-            .include(g2o_include_path)
-            .include("/usr/include/eigen3/")
-            .flag("-std=c++17")
-            .build(file_name);
     }
+    cpp_build::Config::new()
+        .include(g2o_include_path)
+        .include("/usr/include/eigen3/")
+        .flag("-std=c++17")
+        .build("src/lib.rs");
 }
 
 fn main() {
