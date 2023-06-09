@@ -25,6 +25,10 @@ impl<'stored> OptimizableGraph<'stored> {
         })
     }
 
+    // XXX: This _will_ leak memory, because the created edges and
+    //      vertexes are never destroyed (due to
+    //      G2O_NO_IMPLICIT_OWNERSHIP_OF_OBJECTS=ON )
+    //      We should probably keep track of these loaded vertices.
     pub fn load(&mut self, filename: &str) -> bool {
         let obj = self.obj();
         let filename = CString::new(filename).unwrap();
