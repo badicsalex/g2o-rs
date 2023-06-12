@@ -31,6 +31,12 @@ macro_rules! proxy_obj_no_constructor {
                 &mut self.parent
             }
         }
+
+        impl $(<$nlt>)? From<$name $(<$nlt>)?> for $parent {
+            fn from(value: $name $(<$nlt>)?) -> Self {
+                value.parent
+            }
+        }
     };
     ($name: ident $(<$nlt: lifetime>)?) => {
         pub struct $name $(<$nlt>)? {
@@ -42,6 +48,12 @@ macro_rules! proxy_obj_no_constructor {
             #[allow(dead_code)]
             pub(crate) fn obj(&self) -> *const c_void {
                 self._obj
+            }
+            #[allow(dead_code)]
+            pub(crate) fn into_obj(self) -> *const c_void {
+                let result = self._obj;
+                std::mem::forget(self);
+                result
             }
         }
 

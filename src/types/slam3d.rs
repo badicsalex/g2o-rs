@@ -9,7 +9,7 @@ use std::{
 
 use cpp::cpp;
 
-use crate::{macros::proxy_obj, OptimizableGraphEdge, OptimizableGraphVertex};
+use crate::{macros::proxy_obj, OptimizableGraphEdge, OptimizableGraphVertex, Parameter};
 
 cpp! {{
     #include "g2o/types/slam3d/types_slam3d.h"
@@ -54,6 +54,29 @@ impl EdgeSE3 {
     fn construct() -> *mut c_void {
         cpp!( unsafe [] -> *mut c_void as "EdgeSE3*" {
             return new EdgeSE3();
+        })
+    }
+}
+
+proxy_obj!(ParameterCamera, Parameter);
+
+impl ParameterCamera {
+    fn construct() -> *mut c_void {
+        cpp!( unsafe [] -> *mut c_void as "ParameterCamera*" {
+            return new ParameterCamera();
+        })
+    }
+
+    pub fn set_kcam(&mut self, fx: f64, fy: f64, cx: f64, cy: f64) {
+        let obj = self.obj();
+        cpp!( unsafe [
+              obj as "ParameterCamera*",
+              fx as "double",
+              fy as "double",
+              cx as "double",
+              cy as "double"
+        ]{
+            obj->setKcam(fx, fy, cx, cy);
         })
     }
 }

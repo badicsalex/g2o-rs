@@ -5,8 +5,10 @@ mod optimizable_graph;
 mod optimization_algorithm_factory;
 mod robust_kernel;
 mod sparse_optimizer;
+mod parameter;
 
 pub use optimizable_graph::*;
 pub use optimization_algorithm_factory::*;
 pub use robust_kernel::*;
 pub use sparse_optimizer::*;
+pub use parameter::*;

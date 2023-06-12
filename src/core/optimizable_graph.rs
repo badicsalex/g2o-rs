@@ -9,7 +9,7 @@ use std::{
 
 use cpp::cpp;
 
-use crate::{macros::proxy_obj_abstract, RobustKernel};
+use crate::{macros::proxy_obj_abstract, Parameter, RobustKernel};
 
 cpp! {{
     #include "g2o/core/optimizable_graph.h"
@@ -63,6 +63,16 @@ impl<'stored> OptimizableGraph<'stored> {
         })
     }
 
+    // OptimizableGraph takes ownership of parameters.
+    // It's only edges and vertices that get spared.
+    pub fn add_parameter(&mut self, parameter: Parameter) -> bool {
+        let obj = self.obj();
+        let parameter = parameter.into_obj();
+        cpp!( unsafe [obj as "OptimizableGraph*", parameter as "Parameter*"] -> bool as "bool"{
+            return obj->addParameter(parameter);
+        })
+    }
+
     pub fn optimize(&mut self, iterations: i32, online: bool) -> i32 {
         let obj = self.obj();
         cpp!( unsafe [obj as "OptimizableGraph*", iterations as "int", online as "bool"] -> i32 as "int"{
@@ -77,6 +87,34 @@ impl OptimizableGraphVertex {
     fn destruct(obj: *mut c_void) {
         cpp!( unsafe [obj as "OptimizableGraph::Vertex*"] {
             delete obj;
+        })
+    }
+
+    pub fn set_id(&mut self, id: i32) {
+        let obj = self.obj();
+        cpp!( unsafe [obj as "OptimizableGraph::Vertex*", id as "int"] {
+            obj->setId(id);
+        })
+    }
+
+    pub fn id(&mut self) -> i32 {
+        let obj = self.obj();
+        cpp!( unsafe [obj as "OptimizableGraph::Vertex*"] -> i32 as "int" {
+            return obj->id();
+        })
+    }
+
+    pub fn set_marginalized(&mut self, marginalized: bool) {
+        let obj = self.obj();
+        cpp!( unsafe [obj as "OptimizableGraph::Vertex*", marginalized as "bool"] {
+            obj->setMarginalized(marginalized);
+        })
+    }
+
+    pub fn set_fixed(&mut self, fixed: bool) {
+        let obj = self.obj();
+        cpp!( unsafe [obj as "OptimizableGraph::Vertex*", fixed as "bool"] {
+            obj->setFixed(fixed);
         })
     }
 
@@ -112,6 +150,46 @@ impl OptimizableGraphEdge {
     fn destruct(obj: *mut c_void) {
         cpp!( unsafe [obj as "OptimizableGraph::Edge*"] {
             delete obj;
+        })
+    }
+
+    pub fn set_id(&mut self, id: i32) {
+        let obj = self.obj();
+        cpp!( unsafe [obj as "OptimizableGraph::Edge*", id as "int"] {
+            obj->setId(id);
+        })
+    }
+
+    pub fn id(&mut self) -> i32 {
+        let obj = self.obj();
+        cpp!( unsafe [obj as "OptimizableGraph::Edge*"] -> i32 as "int" {
+            return obj->id();
+        })
+    }
+
+    // XXX: not having a 'stored lifetime on vertex is incorrect, because the pointer
+    //      is obviously stored, but that would prevent putting the vertex into the
+    //      graph later.
+    pub fn set_vertex(&mut self, index: i32, vertex: &mut OptimizableGraphVertex) {
+        let obj = self.obj();
+        let vertex = vertex.obj();
+        cpp!( unsafe [
+              obj as "OptimizableGraph::Edge*",
+              index as "int",
+              vertex as "OptimizableGraph::Vertex*"
+        ] {
+            obj->setVertex(index, vertex);
+        })
+    }
+
+    pub fn set_parameter_id(&mut self, arg_num: i32, parameter_id: i32) {
+        let obj = self.obj();
+        cpp!( unsafe [
+              obj as "OptimizableGraph::Edge*",
+              arg_num as "int",
+              parameter_id as "int"
+        ] {
+            obj->setParameterId(arg_num, parameter_id);
         })
     }
 
