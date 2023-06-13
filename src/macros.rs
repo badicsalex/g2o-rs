@@ -4,6 +4,7 @@
 
 macro_rules! proxy_obj_no_constructor {
     ($name: ident $(<$nlt: lifetime>)?, $parent: ty) => {
+        #[derive(Debug)]
         pub struct $name $(<$nlt>)? {
             parent: $parent,
         }
@@ -39,6 +40,7 @@ macro_rules! proxy_obj_no_constructor {
         }
     };
     ($name: ident $(<$nlt: lifetime>)?) => {
+        #[derive(Debug)]
         pub struct $name $(<$nlt>)? {
             _obj: *mut c_void,
             $(_stored_data_tag: PhantomData<&$nlt ()>,)?
