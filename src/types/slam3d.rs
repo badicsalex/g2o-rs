@@ -26,6 +26,34 @@ impl VertexSE3 {
             return new VertexSE3();
         })
     }
+
+    #[cfg(feature = "nalgebra")]
+    pub fn set_estimate(&mut self, estimate: nalgebra::Isometry3<f64>) {
+        self.set_estimate_data(&[
+            estimate.translation.x,
+            estimate.translation.y,
+            estimate.translation.z,
+            estimate.rotation.i,
+            estimate.rotation.j,
+            estimate.rotation.k,
+            estimate.rotation.w,
+        ]);
+    }
+
+    #[cfg(feature = "nalgebra")]
+    pub fn get_estimate(&self) -> nalgebra::Isometry3<f64> {
+        let mut raw_data = [0.0; 7];
+        self.get_estimate_data(&mut raw_data);
+        nalgebra::Isometry3::from_parts(
+            nalgebra::Translation3::new(raw_data[0], raw_data[1], raw_data[2]),
+            nalgebra::UnitQuaternion::new_unchecked(nalgebra::Quaternion::new(
+                raw_data[6],
+                raw_data[3],
+                raw_data[4],
+                raw_data[5],
+            )),
+        )
+    }
 }
 
 proxy_obj!(VertexPointXYZ, OptimizableGraphVertex);
@@ -36,6 +64,17 @@ impl VertexPointXYZ {
             return new VertexPointXYZ();
         })
     }
+    #[cfg(feature = "nalgebra")]
+    pub fn set_estimate(&mut self, estimate: nalgebra::Vector3<f64>) {
+        self.set_estimate_data(&[estimate.x, estimate.y, estimate.z]);
+    }
+
+    #[cfg(feature = "nalgebra")]
+    pub fn get_estimate(&self) -> nalgebra::Vector3<f64> {
+        let mut raw_data = [0.0; 3];
+        self.get_estimate_data(&mut raw_data);
+        nalgebra::Vector3::new(raw_data[0], raw_data[1], raw_data[2])
+    }
 }
 
 proxy_obj!(EdgeSE3PointXYZDisparity, OptimizableGraphEdge);
@@ -45,6 +84,11 @@ impl EdgeSE3PointXYZDisparity {
         cpp!( unsafe [] -> *mut c_void as "EdgeSE3PointXYZDisparity*" {
             return new EdgeSE3PointXYZDisparity();
         })
+    }
+
+    #[cfg(feature = "nalgebra")]
+    pub fn set_measurement(&mut self, position: nalgebra::Vector2<f64>, disparity: f64) {
+        self.set_measurement_data(&[position.x, position.y, disparity]);
     }
 }
 

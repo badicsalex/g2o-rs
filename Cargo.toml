@@ -9,6 +9,10 @@ license = "BSD-2-Clause"
 
 [dependencies]
 cpp = "0.5.8"
+nalgebra = { version = "0.32.2", optional = true }
+
+[features]
+default = ["nalgebra"]
 
 [build-dependencies]
 cmake = "0.1"
