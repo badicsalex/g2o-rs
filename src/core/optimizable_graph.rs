@@ -127,7 +127,7 @@ impl OptimizableGraphVertex {
         })
     }
 
-    pub fn get_estimate_data(&mut self, estimate: &mut [f64]) -> bool {
+    pub fn get_estimate_data(&self, estimate: &mut [f64]) -> bool {
         assert!(estimate.len() >= self.estimate_dimension());
         let obj = self.obj();
         let estimate = estimate.as_ptr();
@@ -170,7 +170,7 @@ impl OptimizableGraphEdge {
     // XXX: not having a 'stored lifetime on vertex is incorrect, because the pointer
     //      is obviously stored, but that would prevent putting the vertex into the
     //      graph later.
-    pub fn set_vertex(&mut self, index: i32, vertex: &mut OptimizableGraphVertex) {
+    pub fn set_vertex(&mut self, index: i32, vertex: &OptimizableGraphVertex) {
         let obj = self.obj();
         let vertex = vertex.obj();
         cpp!( unsafe [
