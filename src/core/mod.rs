@@ -3,12 +3,12 @@
 // Licensed under the BSD 2 Clause license. See LICENSE file in the project root for details.
 mod optimizable_graph;
 mod optimization_algorithm_factory;
+mod parameter;
 mod robust_kernel;
 mod sparse_optimizer;
-mod parameter;
 
 pub use optimizable_graph::*;
 pub use optimization_algorithm_factory::*;
+pub use parameter::*;
 pub use robust_kernel::*;
 pub use sparse_optimizer::*;
-pub use parameter::*;

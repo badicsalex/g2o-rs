@@ -29,7 +29,7 @@ impl Parameter {
         })
     }
 
-    pub fn id(&mut self) -> i32{
+    pub fn id(&mut self) -> i32 {
         let obj = self.obj();
         cpp!( unsafe [obj as "Parameter*"] -> i32 as "int" {
             return obj->id();
