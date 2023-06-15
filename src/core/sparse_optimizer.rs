@@ -39,4 +39,11 @@ impl<'stored> SparseOptimizer<'stored> {
             return obj->initializeOptimization(level);
         })
     }
+
+    pub fn active_robust_chi2(&self) -> f64 {
+        let obj = self.obj();
+        cpp!( unsafe [obj as "SparseOptimizer*"] -> f64 as "double" {
+            return obj->activeRobustChi2();
+        })
+    }
 }
