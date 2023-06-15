@@ -79,6 +79,14 @@ impl<'stored> OptimizableGraph<'stored> {
             return obj->optimize(iterations, online);
         })
     }
+
+    pub fn chi2(&self) -> f64 {
+        let obj = self.obj();
+        cpp!( unsafe [obj as "OptimizableGraph*"] -> f64 as "double" {
+            return obj->chi2();
+        })
+    }
+
 }
 
 proxy_obj_abstract!(OptimizableGraphVertex);
