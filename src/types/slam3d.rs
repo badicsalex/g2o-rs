@@ -46,7 +46,7 @@ impl VertexSE3 {
         self.get_estimate_data(&mut raw_data);
         nalgebra::Isometry3::from_parts(
             nalgebra::Translation3::new(raw_data[0], raw_data[1], raw_data[2]),
-            nalgebra::UnitQuaternion::new_unchecked(nalgebra::Quaternion::new(
+            nalgebra::UnitQuaternion::new_normalize(nalgebra::Quaternion::new(
                 raw_data[6],
                 raw_data[3],
                 raw_data[4],
