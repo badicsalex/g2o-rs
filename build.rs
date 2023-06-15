@@ -9,15 +9,20 @@ fn build_g2o() -> PathBuf {
         .define("G2O_NO_IMPLICIT_OWNERSHIP_OF_OBJECTS", "ON")
         .define("BUILD_SHARED_LIBS", "OFF")
         .define("G2O_USE_LGPL_LIBS", "OFF")
+        .define("G2O_USE_CHOLMOD", "OFF")
         .define("G2O_BUILD_APPS", "OFF")
         .define("G2O_BUILD_EXAMPLES", "OFF")
+        .define("G2O_BUILD_SLAM2D_TYPES", "OFF")
+        .define("G2O_BUILD_SLAM3D_ADDON_TYPES", "OFF")
+        .define("G2O_BUILD_SBA_TYPES", "OFF")
+        .define("G2O_BUILD_ICP_TYPES", "OFF")
+        .define("G2O_BUILD_SIM3_TYPES", "OFF")
         .define("G2O_USE_OPENGL", "OFF")
         .define("G2O_USE_LOGGING", "OFF")
         .build();
     let lib_path = dst.join("lib");
     println!("cargo:rustc-link-search=native={}", lib_path.display());
     println!("cargo:rustc-link-lib=fmt");
-    println!("cargo:rustc-link-lib=cholmod");
     for lib in lib_path.read_dir().unwrap() {
         let libname = lib.unwrap().file_name().to_str().unwrap().to_owned();
         if libname.starts_with("lib") && libname.ends_with(".a") {
