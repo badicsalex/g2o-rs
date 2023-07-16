@@ -86,7 +86,6 @@ impl<'stored> OptimizableGraph<'stored> {
             return obj->chi2();
         })
     }
-
 }
 
 proxy_obj_abstract!(OptimizableGraphVertex);
@@ -206,6 +205,13 @@ impl OptimizableGraphEdge {
         cpp!( unsafe [obj as "OptimizableGraph::Edge*"] -> i32 as "int" {
             return obj->dimension();
         }) as usize
+    }
+
+    pub fn compute_error(&mut self) {
+        let obj = self.obj();
+        cpp!( unsafe [obj as "OptimizableGraph::Edge*"] {
+            return obj->computeError();
+        })
     }
 
     pub fn chi2(&self) -> f64 {

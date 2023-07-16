@@ -57,6 +57,18 @@ impl EdgeSpeed {
             delta_t,
         ]);
     }
+
+    #[cfg(feature = "nalgebra")]
+    pub fn set_information(&mut self, weight: f32) {
+        let obj = self.obj();
+        cpp!( unsafe [
+              obj as "EdgeSpeed*",
+              weight as "float"
+        ]{
+            Vector3 diagonal(weight, weight, weight);
+            obj->setInformation(diagonal.asDiagonal());
+        })
+    }
 }
 
 proxy_obj!(EdgeImuMeasurement, OptimizableGraphEdge);
@@ -85,5 +97,21 @@ impl EdgeImuMeasurement {
             preintegrated_rotation.w,
             delta_t,
         ]);
+    }
+
+    #[cfg(feature = "nalgebra")]
+    pub fn set_information(&mut self, rotation_weight: f32, translation_weight: f32) {
+        let obj = self.obj();
+        cpp!( unsafe [
+              obj as "EdgeImuMeasurement*",
+              rotation_weight as "float",
+              translation_weight as "float"
+        ]{
+            Vector6 diagonal(
+                translation_weight, translation_weight, translation_weight,
+                rotation_weight, rotation_weight, rotation_weight
+            );
+            obj->setInformation(diagonal.asDiagonal());
+        })
     }
 }

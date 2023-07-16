@@ -90,6 +90,19 @@ impl EdgeSE3PointXYZDisparity {
     pub fn set_measurement(&mut self, position: nalgebra::Vector2<f64>, disparity: f64) {
         self.set_measurement_data(&[position.x, position.y, disparity]);
     }
+
+    #[cfg(feature = "nalgebra")]
+    pub fn set_information(&mut self, position_weight: f32, disparity_weight: f32) {
+        let obj = self.obj();
+        cpp!( unsafe [
+              obj as "EdgeSE3PointXYZDisparity*",
+              position_weight as "float",
+              disparity_weight as "float"
+        ]{
+            Vector3 diagonal(position_weight, position_weight, disparity_weight);
+            obj->setInformation(diagonal.asDiagonal());
+        })
+    }
 }
 
 proxy_obj!(EdgeSE3, OptimizableGraphEdge);
