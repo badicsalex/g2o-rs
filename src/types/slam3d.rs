@@ -8,6 +8,7 @@ use std::{
 };
 
 use cpp::cpp;
+use nalgebra::Isometry3;
 
 use crate::{macros::proxy_obj, OptimizableGraphEdge, OptimizableGraphVertex, Parameter};
 
@@ -134,6 +135,32 @@ impl ParameterCamera {
               cy as "double"
         ]{
             obj->setKcam(fx, fy, cx, cy);
+        })
+    }
+
+    pub fn set_offset(&mut self, offset: &Isometry3<f64>) {
+        let obj = self.obj();
+        let x = offset.translation.x;
+        let y = offset.translation.y;
+        let z = offset.translation.z;
+        let i = offset.rotation.i;
+        let j = offset.rotation.j;
+        let k = offset.rotation.k;
+        let w = offset.rotation.w;
+        cpp!( unsafe [
+              obj as "ParameterCamera*",
+              x as "double",
+              y as "double",
+              z as "double",
+              i as "double",
+              j as "double",
+              k as "double",
+              w as "double"
+        ]{
+            Isometry3 o;
+            o = Quaternion(w, i, j, k).toRotationMatrix();
+            o.translation() = Vector3(x,y,z);
+            obj->setOffset(o);
         })
     }
 }
