@@ -5,21 +5,26 @@
 use std::path::{Path, PathBuf};
 
 fn build_g2o() -> PathBuf {
-    let dst = cmake::Config::new("g2o")
-        .define("G2O_NO_IMPLICIT_OWNERSHIP_OF_OBJECTS", "ON")
-        .define("BUILD_SHARED_LIBS", "OFF")
-        .define("G2O_USE_LGPL_LIBS", "OFF")
-        .define("G2O_USE_CHOLMOD", "OFF")
-        .define("G2O_BUILD_APPS", "OFF")
-        .define("G2O_BUILD_EXAMPLES", "OFF")
-        .define("G2O_BUILD_SLAM2D_TYPES", "OFF")
-        .define("G2O_BUILD_SLAM3D_ADDON_TYPES", "OFF")
-        .define("G2O_BUILD_SBA_TYPES", "OFF")
-        .define("G2O_BUILD_ICP_TYPES", "OFF")
-        .define("G2O_BUILD_SIM3_TYPES", "OFF")
-        .define("G2O_USE_OPENGL", "OFF")
-        .define("G2O_USE_LOGGING", "OFF")
-        .build();
+    let mut dst = cmake::Config::new("g2o");
+    dst.define("G2O_NO_IMPLICIT_OWNERSHIP_OF_OBJECTS", "ON");
+    dst.define("BUILD_SHARED_LIBS", "OFF");
+    dst.define("G2O_USE_LGPL_LIBS", "OFF");
+    dst.define("G2O_USE_CHOLMOD", "OFF");
+    dst.define("G2O_BUILD_APPS", "OFF");
+    dst.define("G2O_BUILD_EXAMPLES", "OFF");
+    dst.define("G2O_BUILD_SLAM2D_TYPES", "OFF");
+    dst.define("G2O_BUILD_SLAM3D_ADDON_TYPES", "OFF");
+    dst.define("G2O_BUILD_SBA_TYPES", "OFF");
+    dst.define("G2O_BUILD_ICP_TYPES", "OFF");
+    dst.define("G2O_BUILD_SIM3_TYPES", "OFF");
+    dst.define("G2O_USE_OPENGL", "OFF");
+    dst.define("G2O_USE_LOGGING", "OFF");
+    dst.define(
+        "EIGEN3_INCLUDE_DIR",
+        std::fs::canonicalize("eigen").unwrap(),
+    );
+
+    let dst = dst.build();
     let lib_path = dst.join("lib");
     println!("cargo:rustc-link-search=native={}", lib_path.display());
     println!("cargo:rustc-link-lib=fmt");

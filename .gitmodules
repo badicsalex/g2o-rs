@@ -1,3 +1,7 @@
 [submodule "g2o"]
 	path = g2o
 	url = https://github.com/badicsalex/g2o.git
+[submodule "eigen"]
+	path = eigen
+	url = https://gitlab.com/libeigen/eigen.git
+	branch = 3.4.1
