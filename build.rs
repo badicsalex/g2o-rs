@@ -24,6 +24,12 @@ fn build_g2o() -> PathBuf {
         std::fs::canonicalize("eigen").unwrap(),
     );
 
+    println!("cargo:rerun-if-env-changed=ANDROID_NDK");
+    if let Ok(ndk) = std::env::var("ANDROID_NDK") {
+        dst.define("CMAKE_SYSTEM_NAME", "Android");
+        dst.define("ANDROID_NDK", ndk);
+    }
+
     let dst = dst.build();
     let lib_path = dst.join("lib");
     println!("cargo:rustc-link-search=native={}", lib_path.display());
