@@ -33,7 +33,6 @@ fn build_g2o() -> PathBuf {
     let dst = dst.build();
     let lib_path = dst.join("lib");
     println!("cargo:rustc-link-search=native={}", lib_path.display());
-    println!("cargo:rustc-link-lib=fmt");
     for lib in lib_path.read_dir().unwrap() {
         let libname = lib.unwrap().file_name().to_str().unwrap().to_owned();
         if libname.starts_with("lib") && libname.ends_with(".a") {
