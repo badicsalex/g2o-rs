@@ -118,6 +118,13 @@ impl OptimizableGraphVertex {
         })
     }
 
+    pub fn fixed(&self) -> bool {
+        let obj = self.obj();
+        cpp!( unsafe [obj as "OptimizableGraph::Vertex*"] -> bool as "bool" {
+            return obj->fixed();
+        })
+    }
+
     pub fn set_fixed(&mut self, fixed: bool) {
         let obj = self.obj();
         cpp!( unsafe [obj as "OptimizableGraph::Vertex*", fixed as "bool"] {
