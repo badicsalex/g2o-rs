@@ -71,6 +71,58 @@ impl EdgeSpeed {
     }
 }
 
+proxy_obj!(VertexImuBias, OptimizableGraphVertex);
+
+impl VertexImuBias {
+    fn construct() -> *mut c_void {
+        cpp!( unsafe [] -> *mut c_void as "VertexImuBias*" {
+            return new VertexImuBias();
+        })
+    }
+    #[cfg(feature = "nalgebra")]
+    pub fn set_estimate(&mut self, estimate: nalgebra::Vector6<f64>) {
+        self.set_estimate_data(estimate.as_slice());
+    }
+
+    #[cfg(feature = "nalgebra")]
+    pub fn get_estimate(&self) -> nalgebra::Vector6<f64> {
+        let mut raw_data = [0.0; 6];
+        self.get_estimate_data(&mut raw_data);
+        nalgebra::Vector6::from_data(nalgebra::ArrayStorage([raw_data]))
+    }
+}
+
+proxy_obj!(EdgeImuBias, OptimizableGraphEdge);
+
+impl EdgeImuBias {
+    fn construct() -> *mut c_void {
+        cpp!( unsafe [] -> *mut c_void as "EdgeImuBias*" {
+            return new EdgeImuBias();
+        })
+    }
+
+    #[cfg(feature = "nalgebra")]
+    pub fn set_measurement(&mut self, bias: nalgebra::Vector6<f64>) {
+        self.set_measurement_data(bias.as_slice());
+    }
+
+    #[cfg(feature = "nalgebra")]
+    pub fn set_information(&mut self, rotation_weight: f32, translation_weight: f32) {
+        let obj = self.obj();
+        cpp!( unsafe [
+              obj as "EdgeImuBias*",
+              rotation_weight as "float",
+              translation_weight as "float"
+        ]{
+            Vector6 diagonal(
+                translation_weight, translation_weight, translation_weight,
+                rotation_weight, rotation_weight, rotation_weight
+            );
+            obj->setInformation(diagonal.asDiagonal());
+        })
+    }
+}
+
 proxy_obj!(EdgeImuMeasurement, OptimizableGraphEdge);
 
 impl EdgeImuMeasurement {
