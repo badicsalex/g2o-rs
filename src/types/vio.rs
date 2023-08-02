@@ -49,12 +49,26 @@ impl EdgeSpeed {
     }
 
     #[cfg(feature = "nalgebra")]
-    pub fn set_measurement(&mut self, preintegrated_speed: nalgebra::Vector3<f64>, delta_t: f64) {
+    pub fn set_measurement(
+        &mut self,
+        preintegrated_speed: nalgebra::Vector3<f64>,
+        delta_t: f64,
+        acc_bias_covariance: nalgebra::Matrix3<f64>,
+    ) {
         self.set_measurement_data(&[
             preintegrated_speed.x,
             preintegrated_speed.y,
             preintegrated_speed.z,
             delta_t,
+            acc_bias_covariance.m11,
+            acc_bias_covariance.m21,
+            acc_bias_covariance.m31,
+            acc_bias_covariance.m12,
+            acc_bias_covariance.m22,
+            acc_bias_covariance.m32,
+            acc_bias_covariance.m13,
+            acc_bias_covariance.m23,
+            acc_bias_covariance.m33,
         ]);
     }
 
@@ -80,15 +94,29 @@ impl VertexImuBias {
         })
     }
     #[cfg(feature = "nalgebra")]
-    pub fn set_estimate(&mut self, estimate: nalgebra::Vector6<f64>) {
-        self.set_estimate_data(estimate.as_slice());
+    pub fn set_estimate(
+        &mut self,
+        gyro_bias: nalgebra::Vector3<f64>,
+        accelerometer_bias: nalgebra::Vector3<f64>,
+    ) {
+        self.set_estimate_data(&[
+            gyro_bias.x,
+            gyro_bias.y,
+            gyro_bias.z,
+            accelerometer_bias.x,
+            accelerometer_bias.y,
+            accelerometer_bias.z,
+        ]);
     }
 
     #[cfg(feature = "nalgebra")]
-    pub fn get_estimate(&self) -> nalgebra::Vector6<f64> {
+    pub fn get_estimate(&self) -> (nalgebra::Vector3<f64>, nalgebra::Vector3<f64>) {
         let mut raw_data = [0.0; 6];
         self.get_estimate_data(&mut raw_data);
-        nalgebra::Vector6::from_data(nalgebra::ArrayStorage([raw_data]))
+        (
+            nalgebra::Vector3::from_row_slice(&raw_data[0..3]),
+            nalgebra::Vector3::from_row_slice(&raw_data[3..6]),
+        )
     }
 }
 
@@ -138,6 +166,8 @@ impl EdgeImuMeasurement {
         preintegrated_position: nalgebra::Vector3<f64>,
         preintegrated_rotation: nalgebra::UnitQuaternion<f64>,
         delta_t: f64,
+        used_gyro_bias: nalgebra::Vector3<f64>,
+        acc_bias_covariance: nalgebra::Matrix3<f64>,
     ) {
         self.set_measurement_data(&[
             preintegrated_position.x,
@@ -148,6 +178,18 @@ impl EdgeImuMeasurement {
             preintegrated_rotation.k,
             preintegrated_rotation.w,
             delta_t,
+            used_gyro_bias.x,
+            used_gyro_bias.y,
+            used_gyro_bias.z,
+            acc_bias_covariance.m11,
+            acc_bias_covariance.m21,
+            acc_bias_covariance.m31,
+            acc_bias_covariance.m12,
+            acc_bias_covariance.m22,
+            acc_bias_covariance.m32,
+            acc_bias_covariance.m13,
+            acc_bias_covariance.m23,
+            acc_bias_covariance.m33,
         ]);
     }
 
