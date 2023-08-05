@@ -19,6 +19,7 @@ fn build_g2o() -> PathBuf {
     dst.define("G2O_BUILD_SIM3_TYPES", "OFF");
     dst.define("G2O_USE_OPENGL", "OFF");
     dst.define("G2O_USE_LOGGING", "OFF");
+    dst.define("G2O_FAST_MATH", "ON");
     dst.define(
         "EIGEN3_INCLUDE_DIR",
         std::fs::canonicalize("eigen").unwrap(),
@@ -27,7 +28,9 @@ fn build_g2o() -> PathBuf {
     println!("cargo:rerun-if-env-changed=ANDROID_NDK");
     if let Ok(ndk) = std::env::var("ANDROID_NDK") {
         dst.define("CMAKE_SYSTEM_NAME", "Android");
+        dst.define("CMAKE_SYSTEM_VERSION", "23");
         dst.define("ANDROID_NDK", ndk);
+        dst.define("CMAKE_EXPORT_COMPILE_COMMANDS", "ON");
     }
 
     let dst = dst.build();
