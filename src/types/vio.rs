@@ -143,8 +143,8 @@ impl EdgeImuBias {
               translation_weight as "float"
         ]{
             Vector6 diagonal(
-                translation_weight, translation_weight, translation_weight,
-                rotation_weight, rotation_weight, rotation_weight
+                rotation_weight, rotation_weight, rotation_weight,
+                translation_weight, translation_weight, translation_weight
             );
             obj->setInformation(diagonal.asDiagonal());
         })
