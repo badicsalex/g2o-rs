@@ -33,6 +33,12 @@ fn build_g2o() -> PathBuf {
         dst.define("CMAKE_EXPORT_COMPILE_COMMANDS", "ON");
     }
 
+    println!("cargo:rerun-if-env-changed=ANDROID_ABI");
+    if let Ok(abi) = std::env::var("ANDROID_ABI") {
+        dst.define("ANDROID_ABI", abi.clone());
+        dst.define("CMAKE_ANDROID_ARCH_ABI", abi);
+    }
+
     let dst = dst.build();
     let lib_path = dst.join("lib");
     println!("cargo:rustc-link-search=native={}", lib_path.display());
